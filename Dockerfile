@@ -20,13 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Enable OpenSSL legacy provider (required for NTLM MD4 authentication)
-RUN python -c " \
-import re; \
-path = '/etc/ssl/openssl.cnf'; \
-with open(path, 'r') as f: text = f.read(); \
-text = re.sub(r'(\[provider_sect\])', r'\1\nlegacy = legacy_sect', text); \
-if '[legacy_sect]' not in text: text += '\n[legacy_sect]\nactivate = 1\n'; \
-with open(path, 'w') as f: f.write(text)"
+RUN python -c "import re; path='/etc/ssl/openssl.cnf'; f=open(path,'r'); t=f.read(); f.close(); t=re.sub(r'(\[provider_sect\])', r'\1\nlegacy = legacy_sect', t); t+='\n[legacy_sect]\nactivate = 1\n' if '[legacy_sect]' not in t else ''; f=open(path,'w'); f.write(t); f.close()"
 
 # Copy uv binary from official astral-sh uv image
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
