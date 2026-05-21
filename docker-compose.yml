@@ -21,8 +21,8 @@ services:
 
     # Map the application to a configurable host port
     # หากเข้าใช้งานผ่าน Reverse Proxy โดยตรง สามารถคอมเมนต์ ports นี้ออกได้
-    ports:
-      - "${HOST_PORT:-80}:${PORT:-8000}"
+    #ports:
+    #"${HOST_PORT:-80}:${PORT:-8000}"
 
     # Volumes mapping
     volumes:
@@ -33,7 +33,7 @@ services:
       # - ./key.pem:/app/key.pem:ro
       # - ./cert.pem:/app/cert.pem:ro
 
-    # Production-ready health check using Python's built-in urllib to check server status
+      # Production-ready health check using Python's built-in urllib to check server status
     healthcheck:
       test: [ "CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:${PORT:-8000}/', timeout=5)" ]
       interval: 30s
