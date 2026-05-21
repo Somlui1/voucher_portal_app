@@ -62,7 +62,7 @@ pip install -r requirements.txt
 ---
 
 ### 2. การตั้งค่าระบบ (.env)
-คัดลอกหรือปรับแต่งข้อมูลในไฟล์ `.env` เพื่อให้ระบบเชื่อมต่อไปยังเซิร์ฟเวอร์ต่างๆ ได้ถูกต้อง:
+คัดลอกหรือปรับแต่งข้อมูลในไฟล์ `.env` เพื่อให้ระบบเชื่อมต่อไปยังเซิร์ฟเวอร์และตั้งค่าระบบได้ถูกต้อง:
 
 ```env
 # ข้อมูลเชื่อมต่อ Ruijie Cloud API
@@ -78,6 +78,11 @@ AD_BASE_DN="DC=aapico,DC=com"
 # การตั้งค่าความปลอดภัยของ JWT Authentication
 JWT_SECRET=aapico-voucher-secret-key-2026
 JWT_EXPIRE_HOURS=8
+
+# การตั้งค่าพอร์ตและการจูนนิ่งเซิร์ฟเวอร์
+PORT=8000       # พอร์ตภายใน Container (แนะนำให้ใช้ 8000 หรือพอร์ตที่ > 1024 สำหรับสิทธิ์ non-root)
+HOST_PORT=80    # พอร์ตภายนอกที่เครื่อง Host จะเปิดให้บริการแก่ผู้ใช้ (เช่น 80 สำหรับ HTTP)
+WORKERS=4       # จำนวน Process Worker ของ Uvicorn (แนะนำตาม CPU Cores * 2 + 1)
 ```
 
 ---
@@ -98,7 +103,7 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 เมื่อเซิร์ฟเวอร์เริ่มทำงานแล้ว สามารถเปิดทดสอบและใช้งานแอปพลิเคชันได้ที่:
-- **หน้าเว็บหลัก**: [http://localhost:8000/SOS/generate-ticket/preview](http://localhost:8000/SOS/generate-ticket/preview)
+- **หน้าเว็บหลัก**: [http://localhost:8000/](http://localhost:8000/) (หรือปรับพอร์ตตามที่ระบุใน .env)
 - **หน้าคู่มือ API (Swagger UI)**: [http://localhost:8000/docs](http://localhost:8000/docs)
 
 ---
@@ -109,6 +114,46 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 2. **การลงทะเบียนเส้นทาง API ที่สะอาด**: มีการรวบรวมเฉพาะส่วนเชื่อมต่อ `/auth` และ `/SOS` ซึ่งสัมพันธ์กันกับตัวหน้าเว็บ frontend ตรงๆ และปิด endpoints ส่วนอื่นๆ (เช่น SLA calculations, holiday settings, และการแจ้งซ่อมของ Intranet)
 3. **การจัดการ Path ของ Template**: ย้ายการอ้างอิงตำแหน่งโฟลเดอร์ component ต่างๆ ไปอยู่ในระดับเดียวกันกับ router ของตัวเอง ทำให้หมดกังวลเรื่องการหาไฟล์ HTML templates ไม่เจอ
 4. **ระบบ PDF Generation ในตัว**: สามารถแปลงรูปเล่มคูปอง HTML ออกมาเป็น PDF ผ่าน Chromium หรือ Google Chrome/Microsoft Edge ในเครื่องของผู้ใช้งานได้อย่างรวดเร็ว
+
+---
+
+## 🐳 การใช้งานด้วย Docker และ Docker Compose (Production)
+
+ระบบได้รับการออกแบบให้พร้อมสำหรับการทำ Containerization เพื่อนำไปใช้งานจริง (Production-ready) ผ่าน Docker โดยมีองค์ประกอบเพิ่มเติมดังนี้:
+
+### 1. ไฟล์ที่เพิ่มเข้ามาสำหรับ Docker
+- **`Dockerfile`**: ใช้ `python:3.10-slim` เป็น base image โดยติดตั้งระบบ **Headless Chromium** และฟอนต์ภาษาไทย (`fonts-thai-tlwg`) สำหรับการแปลง PDF และรันแอปพลิเคชันด้วยสิทธิ์การใช้งานของ `appuser` (Non-root user) เพื่อความปลอดภัย
+- **`docker-compose.yml`**: ไฟล์สำหรับจัดการการทำงานของ Container กำหนดให้โหลดค่าจาก `.env` ตั้งค่า restart เสมอหากแอปหยุดทำงาน และตั้งค่า Docker healthcheck
+- **`.dockerignore`**: ช่วยกรองไม่ให้ไฟล์ที่ไม่จำเป็น เช่น `.venv`, `.env` และ cache ต่างๆ หลุดเข้าไปในการ build image
+
+### 2. การกำหนดค่าสำคัญสำหรับ Docker (พอร์ต, Worker และ Network)
+- **พอร์ตภายใน (`PORT`)**: ถูกกำหนดให้รันอยู่ที่พอร์ต `8000` (เป็นพอร์ตที่ปลอดภัยสำหรับสิทธิ์ Non-root) โดยผู้ใช้สามารถเปลี่ยนใน `.env` ได้
+- **พอร์ตภายนอก (`HOST_PORT`)**: คือพอร์ตจริงที่เปิดให้บริการภายนอก เช่น พอร์ต `80` (HTTP) โดย Docker Compose จะแมป `HOST_PORT:PORT` (เช่น `80:8000`) ให้โดยอัตโนมัติ เพื่อให้ผู้ใช้ภายนอกเข้าใช้งานผ่านเว็บเบราว์เซอร์ได้ปกติ
+- **จำนวน Worker (`WORKERS`)**: กำหนดขีดความสามารถในการประมวลผลคำขอพร้อมกัน (Concurrency) แนะนำให้ตั้งตามกำลังของ CPU เครื่องโฮสต์
+- **เครือข่ายภายนอก (`networks`)**:
+  > [!IMPORTANT]
+  > ในไฟล์ `docker-compose.yml` มีการเชื่อมต่อเครือข่ายภายนอก (External Network) ชื่อ `global-proxy-net` ไว้ เพื่อใช้ร่วมกับระบบ Reverse Proxy (เช่น Nginx, Traefik)
+  > **การจัดการเครือข่ายนี้:**
+  > - หากมีเครื่องมือ Proxy อยู่แล้วและสร้างเครือข่ายนี้ไว้แล้ว: สามารถรันต่อได้เลย
+  > - หากรันบนเครื่อง Local หรือ Server ที่ยังไม่มีเครือข่ายนี้: ให้สร้างก่อนด้วยคำสั่ง `docker network create global-proxy-net`
+  > - หรือหากไม่ต้องการใช้เครือข่ายนี้: สามารถลบหรือ Comment หัวข้อ `networks` ใน `docker-compose.yml` ออก เพื่อใช้ Default Network ของ Docker Compose ได้
+
+### 3. การสั่งรันผ่าน Docker Compose
+คุณสามารถสั่งรันแอปพลิเคชันได้ง่ายๆ ด้วยขั้นตอนดังนี้:
+
+1. ตรวจสอบให้แน่ใจว่าไฟล์ `.env` มีข้อมูล Credentials และพอร์ตครบถ้วน
+2. หากต้องการรันระบบผ่าน HTTPS ให้เตรียมไฟล์ `key.pem` และ `cert.pem` ไว้ที่รูทของโครงการ จากนั้นให้ยกเลิกคอมเมนต์บรรทัด volume mount ใน `docker-compose.yml` เพื่อนำเข้าไปรันใน container
+3. รันคำสั่ง Docker Compose เพื่อทำการสร้าง Image และรัน Container ขึ้นมาแบบเบื้องหลัง (Detached mode):
+   ```bash
+   docker compose up -d --build
+   ```
+
+4. สามารถตรวจสอบสถานะการทำงานของ Container ได้ด้วยคำสั่ง:
+   ```bash
+   docker compose ps
+   ```
+
+5. แอปพลิเคชันจะรันบนพอร์ตภายนอกที่กำหนดใน `HOST_PORT` (เช่น พอร์ต `80` ของเครื่อง Host) สามารถเข้าใช้งานได้ทันทีที่ [http://localhost/](http://localhost/) (หรือปรับเป็นไอพีของเซิร์ฟเวอร์จริงและตามพอร์ตใน `HOST_PORT`)
 
 ---
 

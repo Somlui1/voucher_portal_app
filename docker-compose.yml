@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  voucher-portal:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: voucher-portal-app
+    restart: unless-stopped
+
+    # Load credentials and configuration from .env file
+    env_file:
+      - .env
+
+    networks:
+      - proxy-tier
+    # Pass environment variables to control server tuning
+    environment:
+      - PORT=${PORT:-8000}
+      - WORKERS=${WORKERS:-4}
+
+    # Map the application to a configurable host port
+    ports:
+      - "${HOST_PORT:-80}:${PORT:-8000}"
+
+    # Volumes mapping
+    volumes:
+      # Optional: Uncomment and modify these paths if you want to mount SSL certificates for HTTPS.
+      # The server will automatically switch to HTTPS if it detects 'key.pem' and 'cert.pem' in the root directory.
+      # - ./key.pem:/app/key.pem:ro
+      # - ./cert.pem:/app/cert.pem:ro
+
+      # Optional: Mount a local folder for logs if necessary
+      # - ./logs:/app/logs
+
+    # Production-ready health check using Python's built-in urllib to check server status
+    healthcheck:
+      test: [ "CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:${PORT:-8000}/', timeout=5)" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  proxy-tier:
+    external: true
+    name: global-proxy-net # ชื่อเน็ตเวิร์กเดียวกับที่สร้างไว้

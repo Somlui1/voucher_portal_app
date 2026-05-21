@@ -5,14 +5,14 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 from jinja2 import Environment, FileSystemLoader
 from helper.converttopdf import html_to_pdf
-from app.service.vocher_wifi import (
+from ..service.vocher_wifi import (
     create_voucher_endpoint,
     get_access_token,
     get_network_group_id,
     get_all_network_groups,
     get_all_profiles,
 )
-from app.routers.auth import get_current_user
+from .auth import get_current_user
 
 # Jinja2 template setup
 TEMPLATE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "component")

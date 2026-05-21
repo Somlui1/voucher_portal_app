@@ -9,7 +9,7 @@ from fastapi import APIRouter, HTTPException, Depends, Header
 from pydantic import BaseModel
 from typing import Optional, List
 
-from app.service.auth_service import authenticate_ad, create_token, verify_token, get_supported_domains
+from ..service.auth_service import authenticate_ad, create_token, verify_token, get_supported_domains
 
 
 router = APIRouter(

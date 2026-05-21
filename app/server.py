@@ -22,10 +22,13 @@ if __name__ == "__main__":
     else:
         print("SSL certificates (key.pem/cert.pem) not found. Starting server with HTTP...")
 
+    port = int(os.getenv("PORT", "8000"))
+    workers = int(os.getenv("WORKERS", "4"))
+
     uvicorn.run(
         "app.main:app",
         host="0.0.0.0",
-        port=8000,
-        workers=4,
+        port=port,
+        workers=workers,
         **ssl_args
     )
