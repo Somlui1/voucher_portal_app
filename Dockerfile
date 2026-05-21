@@ -19,6 +19,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     tini \
     && rm -rf /var/lib/apt/lists/*
 
+# Enable OpenSSL legacy provider (required for NTLM MD4 authentication)
+RUN sed -i '/\[provider_sect\]/a legacy = legacy_sect' /etc/ssl/openssl.cnf && \
+    echo -e "\n[legacy_sect]\nactivate = 1" >> /etc/ssl/openssl.cnf
+
 # Copy uv binary from official astral-sh uv image
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 

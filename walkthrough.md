@@ -164,4 +164,25 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 ---
 
+## ⚠️ Troubleshooting (ปัญหาที่พบได้บ่อย)
+
+### 1. ปัญหาการเชื่อมต่อ Active Directory / LDAP ล้มเหลว (`unsupported hash type MD4`)
+*   **อาการ:** บันทึก Logs แสดงข้อความ `Unexpected auth error on domain aapico.com: unsupported hash type MD4` และการล็อกอินส่งกลับค่าเป็น `401 Unauthorized` เสมอ
+*   **สาเหตุ:** เนื่องจากระบบปฏิบัติการ Linux สมัยใหม่และ Python 3.10+ ใน Base Image ทำงานร่วมกับ OpenSSL 3.0+ ซึ่งมีการปิดการใช้งานอัลกอริทึม Hash แบบเก่า (Legacy hashes เช่น MD4 ซึ่งใช้สำหรับ NTLM Authentication ในไลบรารี `ldap3`) เพื่อความปลอดภัย
+*   **การแก้ไข (ดำเนินการแล้ว):** ได้เพิ่มสคริปต์ลงใน `Dockerfile` เพื่อเปิดการใช้ **OpenSSL Legacy Provider** ภายใน Container โดยอัตโนมัติ ทำให้ Python เรียกใช้ MD4 สำหรับ NTLM Auth คุยกับ Active Directory ได้ตามปกติ
+*   **วิธีอัปเดต:** ให้ทำการ Build image ใหม่ด้วยคำสั่ง `docker compose up -d --build`
+
+### 2. ปัญหา Nginx Reverse Proxy เข้าถึง Container ไม่ได้
+*   **ข้อควรระวัง:** ในกรณีที่เซิร์ฟเวอร์ QA ใช้ Nginx เป็น Reverse Proxy และเชื่อมต่อเข้าหา Container ผ่านเครือข่าย Docker (`global-proxy-net`)
+*   **การตั้งค่า:** พอร์ตภายในของ Container รันอยู่ที่ `PORT=8000` (ตามที่ระบุใน `.env`) ดังนั้น ในไฟล์คอนฟิก Nginx ของคุณตรงส่วน `proxy_pass` จะต้องชี้พอร์ตให้ตรงกันด้วย:
+    ```nginx
+    # ถูกต้อง: ชี้ไปที่พอร์ตภายใน 8000 ของ Container
+    proxy_pass http://voucher-portal-app:8000;
+    
+    # ไม่ถูกต้อง (หากใน .env PORT=8000):
+    # proxy_pass http://voucher-portal-app:80;
+    ```
+
+---
+
 จัดทำโดยทีมพัฒนาเพื่อช่วยให้การโยกย้ายระบบเป็นไปอย่างรวดเร็วและปลอดภัย!
