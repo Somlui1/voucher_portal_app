@@ -19,17 +19,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     tini \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python requirements
+# Copy uv binary from official astral-sh uv image
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+# Install Python requirements using uv
 COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt
+RUN uv pip install --system --no-cache -r requirements.txt
 
 # Create a non-privileged user to run the application for improved security
 RUN useradd -u 10001 -m appuser \
     && chown -R appuser:appuser /app
-
-# Copy application source code
-COPY --chown=appuser:appuser app/ /app/app/
-COPY --chown=appuser:appuser helper/ /app/helper/
 
 # Switch to the non-root user
 USER appuser
