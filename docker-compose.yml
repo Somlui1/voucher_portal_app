@@ -16,7 +16,7 @@ services:
       - proxy-tier
     # Pass environment variables to control server tuning
     environment:
-      - PORT=${PORT:-8000}
+      #- PORT=${PORT:-8000}
       - WORKERS=${WORKERS:-4}
 
     # Map the application to a configurable host port
