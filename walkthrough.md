@@ -166,11 +166,11 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 ## ⚠️ Troubleshooting (ปัญหาที่พบได้บ่อย)
 
-### 1. ปัญหาการเชื่อมต่อ Active Directory / LDAP ล้มเหลว (`unsupported hash type MD4`)
-*   **อาการ:** บันทึก Logs แสดงข้อความ `Unexpected auth error on domain aapico.com: unsupported hash type MD4` และการล็อกอินส่งกลับค่าเป็น `401 Unauthorized` เสมอ
-*   **สาเหตุ:** เนื่องจากระบบปฏิบัติการ Linux สมัยใหม่และ Python 3.10+ ใน Base Image ทำงานร่วมกับ OpenSSL 3.0+ ซึ่งมีการปิดการใช้งานอัลกอริทึม Hash แบบเก่า (Legacy hashes เช่น MD4 ซึ่งใช้สำหรับ NTLM Authentication ในไลบรารี `ldap3`) เพื่อความปลอดภัย
-*   **การแก้ไข (ดำเนินการแล้ว):** ได้เพิ่มสคริปต์ลงใน `Dockerfile` เพื่อเปิดการใช้ **OpenSSL Legacy Provider** ภายใน Container โดยอัตโนมัติ ทำให้ Python เรียกใช้ MD4 สำหรับ NTLM Auth คุยกับ Active Directory ได้ตามปกติ
-*   **วิธีอัปเดต:** ให้ทำการ Build image ใหม่ด้วยคำสั่ง `docker compose up -d --build`
+### 1. ปัญหาการเชื่อมต่อ Active Directory / LDAP ล้มเหลว (`unsupported hash type MD4` และ `LIBRARY_HAS_NO_CIPHERS`)
+*   **อาการ:** บันทึก Logs แสดงข้อความ `unsupported hash type MD4` หรือ `ssl.SSLError: [SSL: LIBRARY_HAS_NO_CIPHERS] library has no ciphers`
+*   **สาเหตุ:** เนื่องจากระบบปฏิบัติการ Linux สมัยใหม่และ Python 3.10+ ใน Base Image ทำงานร่วมกับ OpenSSL 3.0+ ซึ่งปิดการใช้งานอัลกอริทึม Hash แบบเก่า (Legacy hashes เช่น MD4 สำหรับ NTLM) เป็นค่าเริ่มต้น และหากเราเปิดเฉพาะ `legacy` provider โดยไม่สั่งเปิดใช้งาน `default` provider กลับขึ้นมาด้วย ระบบ OpenSSL จะไม่มีชุดรหัส (Ciphers) ทั่วไปในการทำ TLS/SSL เลย ทำให้เกิดข้อผิดพลาด ciphers หายตามมา
+*   **การแก้ไข (ดำเนินการแล้ว):** ได้ปรับปรุงสคริปต์ใน `Dockerfile` ให้ทำการเปิดใช้งานทั้ง **default** และ **legacy** provider ควบคู่กันในไฟล์คอนฟิก `/etc/ssl/openssl.cnf` ส่งผลให้ระบบรองรับ MD4 และยังใช้งานชุด ciphers ตามปกติในการเชื่อมต่ออื่นๆ ได้ครบถ้วน
+*   **วิธีอัปเดต:** ให้ทำการ Build image ใหม่ด้วยคำสั่ง `docker compose up -d --build --no-cache`
 
 ### 2. ปัญหา Nginx Reverse Proxy เข้าถึง Container ไม่ได้
 *   **ข้อควรระวัง:** ในกรณีที่เซิร์ฟเวอร์ QA ใช้ Nginx เป็น Reverse Proxy และเชื่อมต่อเข้าหา Container ผ่านเครือข่าย Docker (`global-proxy-net`)
