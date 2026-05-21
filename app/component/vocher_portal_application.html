@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>AAPICO Industrial - Voucher Portal</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap"
+        rel="stylesheet" />
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Theme Configuration -->
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#161c27",
+                        "inverse-on-surface": "#313031",
+                        "error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#414754",
+                        "on-primary-fixed": "#001847",
+                        "inverse-surface": "#e5e2e3",
+                        "error": "#ffb4ab",
+                        "on-surface": "#e5e2e3",
+                        "surface-bright": "#39393a",
+                        "surface-container": "#201f20",
+                        "on-secondary-container": "#003c0e",
+                        "secondary": "#4ee263",
+                        "on-primary-fixed-variant": "#2d457c",
+                        "tertiary-container": "#333945",
+                        "tertiary": "#c1c6d6",
+                        "primary": "#1d366d",
+                        "primary-container": "#1d366d",
+                        "surface-variant": "#353436",
+                        "primary-fixed": "#dae2ff",
+                        "outline-variant": "#444650",
+                        "surface-container-low": "#1c1b1c",
+                        "on-secondary-fixed": "#002105",
+                        "on-secondary": "#00390d",
+                        "surface-container-highest": "#353436",
+                        "outline": "#8e909b",
+                        "surface": "#131314",
+                        "primary-fixed-dim": "#b1c5ff",
+                        "on-tertiary-container": "#9da2b1",
+                        "secondary-fixed": "#6eff7c",
+                        "on-surface-variant": "#c5c6d1",
+                        "secondary-container": "#00b43c",
+                        "surface-dim": "#131314",
+                        "surface-container-high": "#2a2a2b",
+                        "on-primary": "#132e64",
+                        "on-secondary-fixed-variant": "#005317",
+                        "on-primary-container": "#8aa1df",
+                        "surface-container-lowest": "#0e0e0f",
+                        "background": "#131314",
+                        "secondary-fixed-dim": "#4ee263",
+                        "tertiary-fixed-dim": "#c1c6d6",
+                        "on-error": "#690005",
+                        "tertiary-fixed": "#dde2f2",
+                        "surface-tint": "#b1c5ff",
+                        "on-tertiary": "#2a303d",
+                        "on-background": "#e5e2e3",
+                        "on-error-container": "#ffdad6",
+                        "inverse-primary": "#465d96",
+                        "aapico-blue": "#002347",
+                        "aapico-green": "#00A150"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0rem",
+                        "lg": "0rem",
+                        "xl": "0rem",
+                        "full": "0rem"
+                    },
+                    "spacing": {
+                        "xl": "80px",
+                        "margin": "32px",
+                        "gutter": "24px",
+                        "base": "4px",
+                        "sm": "16px",
+                        "xs": "8px",
+                        "lg": "48px",
+                        "md": "24px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Bai Jamjuree", "sans-serif"],
+                        "display-lg": ["Bai Jamjuree", "sans-serif"],
+                        "headline-md": ["Bai Jamjuree", "sans-serif"],
+                        "label-md": ["Bai Jamjuree", "sans-serif"],
+                        "headline-lg": ["Bai Jamjuree", "sans-serif"],
+                        "headline-lg-mobile": ["Bai Jamjuree", "sans-serif"],
+                        "body-lg": ["Bai Jamjuree", "sans-serif"],
+                        "body-md": ["Bai Jamjuree", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Bai Jamjuree', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .loader {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--outline-variant, #444650);
+            border-top-color: #00A150;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background text-on-surface font-body-md min-h-screen flex flex-col selection:bg-aapico-green selection:text-white">
+    <!-- TopNavBar -->
+    <nav
+        class="bg-surface flex justify-between items-center w-full px-margin py-base max-w-full border-b border-on-tertiary rounded-none">
+        <div class="flex items-center">
+            <span class="font-headline-lg text-[24px] font-bold text-on-surface tracking-tighter">AAPICO
+                INDUSTRIAL</span>
+        </div>
+        <div class="hidden md:flex gap-margin items-center">
+            <a class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant hover:text-aapico-blue transition-colors duration-200"
+                href="#">SOLUTIONS</a>
+            <a class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant hover:text-aapico-blue transition-colors duration-200"
+                href="#">ENGINEERING</a>
+            <a class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant hover:text-aapico-blue transition-colors duration-200"
+                href="#">PARTNERS</a>
+            <a class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant hover:text-aapico-blue transition-colors duration-200"
+                href="#">CONTACT</a>
+        </div>
+        <div>
+            <button id="navLogoutBtn" onclick="handleLogout()"
+                class="hidden bg-red-600 text-white font-label-md text-label-md uppercase tracking-wider px-sm py-xs rounded-none hover:opacity-80 transition-opacity">LOGOUT</button>
+            <button id="navPortalBtn"
+                class="bg-aapico-blue text-white font-label-md text-label-md uppercase tracking-wider px-sm py-xs rounded-none hover:opacity-80 transition-opacity">PORTAL
+                ACCESS</button>
+        </div>
+    </nav>
+
+    <!-- Main Content Canvas -->
+    <main class="flex-grow flex items-center justify-center p-gutter relative overflow-hidden bg-background py-10">
+
+        <!-- Login Card (Visible by default) -->
+        <div id="loginView"
+            class="bg-aapico-blue w-full max-w-md p-lg rounded-none flex flex-col gap-lg border border-outline-variant/30 relative z-10 transition-opacity duration-300">
+            <!-- Header Section -->
+            <div class="flex flex-col gap-base border-l-[6px] border-aapico-green pl-sm">
+                <h1 class="font-headline-lg text-headline-lg font-bold text-white">Login</h1>
+                <p class="font-body-md text-body-md text-white/80">AAPICO Industrial Network Access</p>
+            </div>
+            <!-- Form -->
+            <form class="flex flex-col gap-md" onsubmit="event.preventDefault(); handleLogin();">
+                <div class="flex flex-col gap-base">
+                    <label class="font-label-sm text-label-sm uppercase tracking-widest text-white/70 ml-0"
+                        for="username">Username</label>
+                    <input
+                        class="bg-white text-black font-body-md px-sm py-3 border border-outline-variant focus:border-aapico-green focus:ring-1 focus:ring-aapico-green focus:outline-none transition-all duration-300 w-full rounded-none"
+                        id="username" placeholder="Enter username" type="text" required />
+                </div>
+                <div class="flex flex-col gap-base">
+                    <label class="font-label-sm text-label-sm uppercase tracking-widest text-white/70 ml-0"
+                        for="password">Password</label>
+                    <input
+                        class="bg-white text-black font-body-md px-sm py-3 border border-outline-variant focus:border-aapico-green focus:ring-1 focus:ring-aapico-green focus:outline-none transition-all duration-300 w-full rounded-none"
+                        id="password" placeholder="Enter password" type="password" required />
+                </div>
+                <div class="flex flex-col gap-base">
+                    <label class="font-label-sm text-label-sm uppercase tracking-widest text-white/70 ml-0"
+                        for="loginDomain">Domain</label>
+                    <select
+                        class="bg-white text-black font-body-md pl-sm pr-[40px] py-3 border border-outline-variant focus:border-aapico-green focus:ring-1 focus:ring-aapico-green focus:outline-none transition-all duration-300 w-full rounded-none truncate"
+                        id="loginDomain" required>
+                        <option value="">Loading Domains...</option>
+                    </select>
+                </div>
+                <button id="btnLogin" type="submit"
+                    class="mt-sm bg-aapico-green text-black font-label-md text-label-md uppercase tracking-wider font-bold py-3 w-full rounded-none hover:opacity-90 transition-all duration-300 flex justify-center items-center gap-xs">
+                    SIGN IN
+                    <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                </button>
+                <div id="loginError"
+                    class="hidden mt-xs text-red-400 font-body-md text-sm bg-red-900/30 border border-red-500/40 px-sm py-2 flex items-center gap-xs">
+                    <span class="material-symbols-outlined text-[16px]">error</span>
+                    <span id="loginErrorText"></span>
+                </div>
+            </form>
+            <!-- Links -->
+            <div class="flex justify-between items-center border-t border-white/20 pt-sm mt-sm">
+                <a class="font-label-sm text-label-sm text-white/70 hover:text-white transition-colors hover:underline underline-offset-4"
+                    href="#">Forgot password?</a>
+                <a class="font-label-sm text-label-sm text-white/70 hover:text-white transition-colors hover:underline underline-offset-4"
+                    href="#">Contact IT Support</a>
+            </div>
+        </div>
+
+        <!-- Voucher Request Form (Hidden by default) -->
+        <div id="voucherView"
+            class="hidden bg-aapico-blue w-full max-w-3xl p-lg rounded-none flex flex-col gap-lg border border-outline-variant/30 relative z-10 transition-opacity duration-300">
+            <!-- Header Section -->
+            <div class="flex flex-col gap-base border-l-[6px] border-aapico-green pl-sm">
+                <h1 class="font-headline-lg text-headline-lg font-bold text-white uppercase">Voucher Request</h1>
+                <p class="font-body-md text-body-md text-white/80">AAPICO Network Authentication System</p>
+            </div>
+
+            <!-- Form -->
+            <div class="flex flex-col gap-md">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+                    <div class="flex flex-col gap-base">
+                        <label class="font-label-sm text-label-sm uppercase tracking-widest text-white/70"
+                            for="firstName">First Name</label>
+                        <input
+                            class="bg-white text-black font-body-md px-sm py-3 border border-outline-variant focus:border-aapico-green focus:ring-1 focus:ring-aapico-green focus:outline-none transition-all w-full"
+                            id="firstName" placeholder="First Name" type="text" />
+                    </div>
+                    <div class="flex flex-col gap-base">
+                        <label class="font-label-sm text-label-sm uppercase tracking-widest text-white/70"
+                            for="lastName">Last Name</label>
+                        <input
+                            class="bg-white text-black font-body-md px-sm py-3 border border-outline-variant focus:border-aapico-green focus:ring-1 focus:ring-aapico-green focus:outline-none transition-all w-full"
+                            id="lastName" placeholder="Last Name" type="text" />
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+                    <div class="flex flex-col gap-base">
+                        <label class="font-label-sm text-label-sm uppercase tracking-widest text-white/70"
+                            for="email">Email</label>
+                        <input
+                            class="bg-white text-black font-body-md px-sm py-3 border border-outline-variant focus:border-aapico-green focus:ring-1 focus:ring-aapico-green focus:outline-none transition-all w-full"
+                            id="email" placeholder="Email Address" type="email" />
+                    </div>
+                    <div class="flex flex-col gap-base">
+                        <label class="font-label-sm text-label-sm uppercase tracking-widest text-white/70"
+                            for="phone">Phone</label>
+                        <input
+                            class="bg-white text-black font-body-md px-sm py-3 border border-outline-variant focus:border-aapico-green focus:ring-1 focus:ring-aapico-green focus:outline-none transition-all w-full"
+                            id="phone" placeholder="Phone Number" type="tel" />
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-md">
+                    <div class="flex flex-col gap-base">
+                        <label class="font-label-sm text-label-sm uppercase tracking-widest text-white/70"
+                            for="groupname">Group</label>
+                        <select
+                            class="bg-white text-black font-body-md pl-sm pr-[40px] py-3 border border-outline-variant focus:border-aapico-green focus:ring-1 focus:ring-aapico-green focus:outline-none transition-all w-full cursor-pointer truncate"
+                            id="groupname" onchange="fetchProfiles()">
+                            <option value="">Select a Group</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col gap-base">
+                        <label class="font-label-sm text-label-sm uppercase tracking-widest text-white/70"
+                            for="profile_name">Profile</label>
+                        <select
+                            class="bg-white text-black font-body-md pl-sm pr-[40px] py-3 border border-outline-variant focus:border-aapico-green focus:ring-1 focus:ring-aapico-green focus:outline-none transition-all w-full cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed truncate"
+                            id="profile_name" disabled>
+                            <option value="">Select a Profile</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col gap-base">
+                        <label class="font-label-sm text-label-sm uppercase tracking-widest text-white/70"
+                            for="quantity">Quantity</label>
+                        <input
+                            class="bg-white text-black font-body-md px-sm py-3 border border-outline-variant focus:border-aapico-green focus:ring-1 focus:ring-aapico-green focus:outline-none transition-all w-full"
+                            id="quantity" value="1" type="number" min="1" max="100" />
+                    </div>
+                    <div class="flex flex-col gap-base">
+                        <label class="font-label-sm text-label-sm uppercase tracking-widest text-white/70">Output Format</label>
+                        <div class="flex bg-white p-1 gap-1 border border-outline-variant">
+                            <!-- Option HTML Print -->
+                            <button type="button" id="opt_print" onclick="selectOutputFormat('print')" class="flex-1 py-2 flex items-center justify-center gap-2 transition-all focus:outline-none bg-aapico-green text-black font-bold">
+                                <span class="material-symbols-outlined text-[20px]">print</span>
+                                <span class="text-xs uppercase tracking-wider">HTML</span>
+                            </button>
+                            <!-- Option Download PDF -->
+                            <button type="button" id="opt_pdf" onclick="selectOutputFormat('pdf')" class="flex-1 py-2 flex items-center justify-center gap-2 transition-all focus:outline-none text-black/60 hover:bg-black/5">
+                                <span class="material-symbols-outlined text-[20px]">picture_as_pdf</span>
+                                <span class="text-xs uppercase tracking-wider">PDF</span>
+                            </button>
+                        </div>
+                        <input type="hidden" id="output_format" value="print">
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-base">
+                    <label class="font-label-sm text-label-sm uppercase tracking-widest text-white/70"
+                        for="comment">Comment</label>
+                    <textarea
+                        class="bg-white text-black font-body-md px-sm py-3 border border-outline-variant focus:border-aapico-green focus:ring-1 focus:ring-aapico-green focus:outline-none transition-all w-full resize-y min-h-[80px]"
+                        id="comment" placeholder="Additional comments..."></textarea>
+                </div>
+
+                <button id="btnGenerate" onclick="processVoucher()"
+                    class="mt-sm bg-aapico-green text-black font-label-md text-label-md uppercase tracking-wider font-bold py-3 w-full rounded-none hover:opacity-90 transition-all duration-300 flex justify-center items-center gap-xs">
+                    GENERATE TICKETS
+                    <span class="material-symbols-outlined text-[18px]">receipt_long</span>
+                </button>
+
+                <div id="statusBox"
+                    class="mt-sm bg-surface p-sm border border-outline-variant hidden items-center justify-between">
+                    <div class="flex items-center gap-sm">
+                        <span id="statusIcon" class="flex items-center"></span>
+                        <span id="statusText" class="font-body-md text-on-surface-variant font-medium">Ready</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer
+        class="bg-surface-container-lowest border-t border-on-tertiary flex flex-col md:flex-row justify-between items-center w-full px-margin py-md gap-sm relative z-10 rounded-none">
+        <div class="font-headline-md text-headline-md font-black text-on-surface">AAPICO</div>
+        <div class="flex flex-wrap gap-margin justify-center">
+            <a class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant hover:text-on-surface underline transition-colors"
+                href="#">PRIVACY POLICY</a>
+            <a class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant hover:text-on-surface underline transition-colors"
+                href="#">TERMS OF SERVICE</a>
+            <a class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant hover:text-on-surface underline transition-colors"
+                href="#">COMPLIANCE</a>
+            <a class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant hover:text-on-surface underline transition-colors"
+                href="#">SECURITY</a>
+        </div>
+        <div class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">
+            © 2024 AAPICO HI-TECH PUBLIC COMPANY LIMITED. ALL RIGHTS RESERVED.
+        </div>
+    </footer>
+
+    <!-- Script Logic -->
+    <script>
+        const API_BASE = window.location.port === '5500' ? 'http://127.0.0.1:8000' : '';
+
+        // ── Token helpers ──────────────────────────────────────────────
+        function getToken() { return sessionStorage.getItem('aapico_token'); }
+        function setToken(t) { sessionStorage.setItem('aapico_token', t); }
+        function clearToken() { sessionStorage.removeItem('aapico_token'); }
+        function authHeaders() {
+            const t = getToken();
+            return t ? { 'Authorization': 'Bearer ' + t } : {};
+        }
+
+        // ── Check Auth on Load & Fetch Domains ────────────────────────
+        window.addEventListener('DOMContentLoaded', async () => {
+            fetchLoginDomains();
+
+            const token = getToken();
+            if (!token) return;
+
+            try {
+                const res = await fetch(API_BASE + '/auth/verify', {
+                    headers: authHeaders()
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    showVoucherView(data);
+                } else {
+                    clearToken();
+                }
+            } catch (e) {
+                clearToken();
+            }
+        });
+
+        // ── Fetch Available Domains ───────────────────────────────────
+        async function fetchLoginDomains() {
+            try {
+                const domSelect = document.getElementById('loginDomain');
+                const res = await fetch(API_BASE + '/auth/domains');
+                const json = await res.json();
+                if (json.status === 'success') {
+                    domSelect.innerHTML = '';
+                    json.domains.forEach(d => {
+                        const opt = document.createElement('option');
+                        opt.value = d;
+                        opt.textContent = d;
+                        domSelect.appendChild(opt);
+                    });
+                } else {
+                    domSelect.innerHTML = '<option value="aapico.com">aapico.com</option>';
+                }
+            } catch (e) {
+                console.error("Failed to load domains: ", e);
+                const domSelect = document.getElementById('loginDomain');
+                if (domSelect) {
+                    domSelect.innerHTML = '<option value="aapico.com">aapico.com</option>';
+                }
+            }
+        }
+
+        // ── Login ──────────────────────────────────────────────────────
+        async function handleLogin() {
+            const usernameInput = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value.trim();
+            const selectedDomain = document.getElementById('loginDomain').value;
+            const btn = document.getElementById('btnLogin');
+            const errBox = document.getElementById('loginError');
+            const errText = document.getElementById('loginErrorText');
+
+            errBox.classList.add('hidden');
+
+            if (!usernameInput || !pass || !selectedDomain) {
+                errText.textContent = 'Please enter username, password, and select a domain.';
+                errBox.classList.remove('hidden');
+                return;
+            }
+
+            // Construct username@domain
+            let user = usernameInput;
+            if (!user.includes('@')) {
+                user = usernameInput + '@' + selectedDomain;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<div class="loader"></div> Authenticating...';
+
+            try {
+                const res = await fetch(API_BASE + '/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: user, password: pass })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.detail || 'Login failed');
+                }
+
+                const data = await res.json();
+                setToken(data.token);
+                showVoucherView(data);
+            } catch (e) {
+                errText.textContent = e.message;
+                errBox.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'SIGN IN <span class="material-symbols-outlined text-[18px]">arrow_forward</span>';
+            }
+        }
+
+        // ── Logout ─────────────────────────────────────────────────────
+        function handleLogout() {
+            clearToken();
+            document.getElementById('voucherView').classList.add('hidden');
+            document.getElementById('loginView').classList.remove('hidden');
+            document.getElementById('navLogoutBtn').classList.add('hidden');
+            document.getElementById('navPortalBtn').classList.remove('hidden');
+            document.getElementById('loginError').classList.add('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('firstName').value = '';
+            document.getElementById('lastName').value = '';
+            document.getElementById('email').value = '';
+        }
+
+        // ── Show Voucher View ──────────────────────────────────────────
+        function showVoucherView(userInfo) {
+            document.getElementById('loginView').classList.add('hidden');
+            document.getElementById('voucherView').classList.remove('hidden');
+            document.getElementById('navPortalBtn').classList.add('hidden');
+            document.getElementById('navLogoutBtn').classList.remove('hidden');
+
+            if (userInfo) {
+                if (userInfo.first_name) {
+                    document.getElementById('firstName').value = userInfo.first_name;
+                }
+                if (userInfo.last_name) {
+                    document.getElementById('lastName').value = userInfo.last_name;
+                }
+                // Auto-fill email format: username@domain.com
+                if (userInfo.username && userInfo.domain) {
+                    document.getElementById('email').value = userInfo.username + '@' + userInfo.domain;
+                } else if (userInfo.email) {
+                    document.getElementById('email').value = userInfo.email;
+                }
+            }
+
+            const groupSelect = document.getElementById('groupname');
+            if (groupSelect && groupSelect.options.length <= 1) {
+                fetchGroups();
+            }
+        }
+
+        // ── Fetch Groups (Protected) ──────────────────────────────────
+        async function fetchGroups() {
+            try {
+                const groupSelect = document.getElementById('groupname');
+                groupSelect.innerHTML = '<option value="">Loading Groups...</option>';
+                const res = await fetch(API_BASE + '/SOS/wifi/groups', {
+                    headers: authHeaders()
+                });
+
+                if (res.status === 401) { handleLogout(); return; }
+
+                const json = await res.json();
+                if (json.status === 'success') {
+                    groupSelect.innerHTML = '<option value="">Select a Group</option>';
+                    json.data.forEach(g => {
+                        const opt = document.createElement('option');
+                        opt.value = g.name;
+                        opt.textContent = g.name;
+                        groupSelect.appendChild(opt);
+                    });
+                } else {
+                    groupSelect.innerHTML = '<option value="">Failed to load groups</option>';
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // ── Fetch Profiles (Protected) ────────────────────────────────
+        async function fetchProfiles() {
+            const groupSelect = document.getElementById('groupname');
+            const profileSelect = document.getElementById('profile_name');
+            const groupname = groupSelect.value;
+
+            profileSelect.innerHTML = '<option value="">Select a Profile</option>';
+
+            if (!groupname) {
+                profileSelect.disabled = true;
+                return;
+            }
+
+            try {
+                profileSelect.innerHTML = '<option value="">Loading Profiles...</option>';
+                profileSelect.disabled = true;
+                const res = await fetch(API_BASE + `/SOS/wifi/groups/${groupname}/profiles`, {
+                    headers: authHeaders()
+                });
+
+                if (res.status === 401) { handleLogout(); return; }
+
+                const json = await res.json();
+                if (json.status === 'success') {
+                    profileSelect.innerHTML = '<option value="">Select a Profile</option>';
+                    json.data.forEach(p => {
+                        const opt = document.createElement('option');
+                        opt.value = p.name;
+                        opt.textContent = p.name;
+                        profileSelect.appendChild(opt);
+                    });
+                    profileSelect.disabled = false;
+                } else {
+                    profileSelect.innerHTML = '<option value="">Failed to load profiles</option>';
+                }
+            } catch (e) {
+                console.error(e);
+                profileSelect.innerHTML = '<option value="">Error loading profiles</option>';
+            }
+        }
+
+        // ── Process Voucher (Protected) ───────────────────────────────
+        async function processVoucher() {
+            const btn = document.getElementById('btnGenerate');
+
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const comment = document.getElementById('comment').value.trim();
+            const groupname = document.getElementById('groupname').value.trim();
+            const profile_name = document.getElementById('profile_name').value.trim();
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const format = document.getElementById('output_format').value;
+
+            if (!groupname || !profile_name || !quantity || quantity < 1) {
+                showStatus('Please fill all required fields.', 'error');
+                return;
+            }
+
+            btn.disabled = true;
+
+            // Open the print window immediately (only if print format chosen) to bypass popup blockers
+            let printWindow = null;
+            if (format === 'print') {
+                printWindow = window.open('', '_blank');
+                if (!printWindow) {
+                    showStatus('Popup blocked. Please allow popups for this site.', 'error');
+                    btn.disabled = false;
+                    return;
+                }
+                printWindow.document.write(`
+                    <html lang="en">
+                    <head><title>Generating Voucher...</title>
+                    <style>
+                        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #f5f5f5; }
+                        h2 { color: #1d366d; }
+                        .loader { border: 4px solid #ddd; border-top: 4px solid #00a150; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-top: 20px;}
+                        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+                    </style></head>
+                    <body><h2>Processing your request...</h2><p>Communicating with Ruijie Cloud</p><div class="loader"></div></body>
+                    </html>
+                `);
+            }
+
+            try {
+                showStatus('Communicating with Ruijie Cloud...', 'loading');
+                const voucherRes = await fetch(API_BASE + '/SOS/generate-voucher', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                    body: JSON.stringify({
+                        groupname, profile_name, quantity,
+                        first_name: firstName, last_name: lastName,
+                        email: email, phone: phone, comment: comment
+                    })
+                });
+
+                if (voucherRes.status === 401) { 
+                     handleLogout(); 
+                     if (printWindow) printWindow.close(); 
+                     return; 
+                }
+                if (!voucherRes.ok) {
+                    const errBody = await voucherRes.text();
+                    throw new Error('Voucher API failed: ' + errBody);
+                }
+
+                const voucherJson = await voucherRes.json();
+                const tickets = voucherJson.data;
+                if (!tickets || tickets.length === 0) throw new Error('No voucher data returned from API.');
+
+                showStatus('Tickets generated (' + tickets.length + '). Processing layout...', 'loading');
+                const ticketPayload = tickets.map(t => ({
+                    voucher_code: t.voucher_code,
+                    profile_name: t.profile_name,
+                    concurrent_devices: t.concurrent_devices || 1,
+                    period: t.period_hours || '1Days',
+                    maximum_download_rate: t.maximum_download_rate_mbps || '20Mbps'
+                }));
+
+                if (format === 'print') {
+                    // HTML Print Flow
+                    const ticketRes = await fetch(API_BASE + '/SOS/generate-ticket', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                        body: JSON.stringify(ticketPayload)
+                    });
+
+                    if (ticketRes.status === 401) { handleLogout(); printWindow.close(); return; }
+                    if (!ticketRes.ok) {
+                        const errBody = await ticketRes.text();
+                        throw new Error('Ticket render failed: ' + errBody);
+                    }
+
+                    const html = await ticketRes.text();
+                    printWindow.document.open();
+                    printWindow.document.write(html);
+                    printWindow.document.close();
+
+                    showStatus('Operation successful. Voucher is ready to print.', 'success');
+                } else {
+                    // PDF Download Flow
+                    const pdfRes = await fetch(API_BASE + '/SOS/generate-ticket/pdf', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                        body: JSON.stringify(ticketPayload)
+                    });
+
+                    if (pdfRes.status === 401) { handleLogout(); return; }
+                    if (!pdfRes.ok) {
+                        const errBody = await pdfRes.text();
+                        throw new Error('PDF generation failed: ' + errBody);
+                    }
+
+                    const blob = await pdfRes.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'voucher.pdf';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+
+                    showStatus('Operation successful. PDF downloaded.', 'success');
+                }
+            } catch (e) {
+                showStatus(e.message, 'error');
+                if (printWindow) {
+                    printWindow.document.open();
+                    printWindow.document.write('<div style="font-family:sans-serif; text-align:center; margin-top:50px; color:#93000a;"><h2>Error Generating Voucher</h2><p>' + e.message + '</p></div>');
+                    printWindow.document.close();
+                }
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // ── Status Display ─────────────────────────────────────────────
+        function showStatus(message, type) {
+            const box = document.getElementById('statusBox');
+            const icon = document.getElementById('statusIcon');
+            const text = document.getElementById('statusText');
+
+            box.classList.remove('hidden');
+            box.classList.add('flex');
+            text.textContent = message;
+
+            if (type === 'loading') {
+                text.className = 'font-body-md text-on-surface-variant font-medium';
+                icon.innerHTML = '<div class="loader"></div>';
+            } else if (type === 'success') {
+                text.className = 'font-body-md text-aapico-green font-bold';
+                icon.innerHTML = '<span class="material-symbols-outlined text-aapico-green">check_circle</span>';
+            } else if (type === 'error') {
+                text.className = 'font-body-md text-error font-bold';
+                icon.innerHTML = '<span class="material-symbols-outlined text-error">error</span>';
+            }
+        }
+
+        // ── Select Output Format ───────────────────────────────────────
+        function selectOutputFormat(format) {
+            document.getElementById('output_format').value = format;
+            const btnPrint = document.getElementById('opt_print');
+            const btnPdf = document.getElementById('opt_pdf');
+            if (format === 'print') {
+                btnPrint.className = "flex-1 py-2 flex items-center justify-center gap-2 transition-all focus:outline-none bg-aapico-green text-black font-bold";
+                btnPdf.className = "flex-1 py-2 flex items-center justify-center gap-2 transition-all focus:outline-none text-black/60 hover:bg-black/5";
+            } else {
+                btnPdf.className = "flex-1 py-2 flex items-center justify-center gap-2 transition-all focus:outline-none bg-aapico-green text-black font-bold";
+                btnPrint.className = "flex-1 py-2 flex items-center justify-center gap-2 transition-all focus:outline-none text-black/60 hover:bg-black/5";
+            }
+        }
+    </script>
+</body>
+
+</html>

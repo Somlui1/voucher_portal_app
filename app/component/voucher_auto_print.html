@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AAPICO | Voucher Auto Print</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --aapico-blue: #1D366D;
+            --aapico-green: #2DC84D;
+            --white: #FFFFFF;
+            --black: #0D0D0E;
+            --cool-gray-08: #D8D9DA;
+            --cool-gray-03: #A1A1A5;
+            --metal-grey: #464C59;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Bai Jamjuree', sans-serif;
+            background-color: var(--black);
+            color: var(--cool-gray-03);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background-color: var(--aapico-blue);
+            padding: 48px;
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid var(--metal-grey);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+        }
+
+        h1 {
+            font-size: 28px;
+            color: var(--white);
+            margin-bottom: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-left: 6px solid var(--aapico-green);
+            padding-left: 16px;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--cool-gray-08);
+            margin-bottom: 32px;
+        }
+
+        .param-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .param-label {
+            color: var(--cool-gray-03);
+            font-size: 14px;
+        }
+
+        .param-value {
+            color: var(--white);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .status-box {
+            margin-top: 24px;
+            padding: 16px;
+            background-color: var(--black);
+            border: 1px solid var(--metal-grey);
+            font-size: 14px;
+            min-height: 56px;
+        }
+
+        .status-text {
+            color: var(--cool-gray-03);
+        }
+
+        .status-success {
+            color: var(--aapico-green);
+            font-weight: 600;
+        }
+
+        .status-error {
+            color: #FF4D4D;
+            font-weight: 600;
+        }
+
+        .loader {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--metal-grey);
+            border-top-color: var(--aapico-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .step-list {
+            margin-top: 16px;
+            list-style: none;
+        }
+
+        .step-list li {
+            padding: 4px 0;
+            font-size: 13px;
+            color: var(--cool-gray-03);
+        }
+
+        .step-list li.done {
+            color: var(--aapico-green);
+        }
+
+        .step-list li.done::before {
+            content: '✔ ';
+        }
+
+        .step-list li.active::before {
+            content: '▶ ';
+            color: var(--aapico-green);
+        }
+
+        .step-list li.pending::before {
+            content: '○ ';
+        }
+
+        .step-list li.error {
+            color: #FF4D4D;
+        }
+
+        .step-list li.error::before {
+            content: '✖ ';
+        }
+
+        .expired-msg {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .expired-msg h2 {
+            color: var(--cool-gray-03);
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .expired-msg p {
+            color: var(--metal-grey);
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="mainContainer">
+        <!-- จะถูกเติม content โดย JS -->
+    </div>
+
+    <script>
+        (function () {
+            const container = document.getElementById('mainContainer');
+            const params = new URLSearchParams(window.location.search);
+            const groupname = params.get('groupname');
+            const profile_name = params.get('profile_name');
+            const quantity = params.get('quantity');
+
+            // ถ้าไม่มี query params (เช่น refresh หลัง replaceState) → แสดงหน้าว่าง
+            if (!groupname && !profile_name && !quantity) {
+                container.innerHTML = `
+                    <div class="expired-msg">
+                        <h2>⏳ Session Expired</h2>
+                        <p>This page has already been used.</p>
+                        <p>กรุณาใช้ URL ใหม่จาก Swagger UI เพื่อ generate voucher อีกครั้ง</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const gn = groupname || 'AH';
+            const pn = profile_name || 'AAPICO_Day';
+            const qty = parseInt(quantity) || 1;
+
+            // แสดง loading UI
+            container.innerHTML = `
+                <h1>Auto Print</h1>
+                <p class="subtitle">Generating vouchers automatically...</p>
+                <div id="paramDisplay">
+                    <div class="param-row">
+                        <span class="param-label">Group Name</span>
+                        <span class="param-value">${gn}</span>
+                    </div>
+                    <div class="param-row">
+                        <span class="param-label">Profile</span>
+                        <span class="param-value">${pn}</span>
+                    </div>
+                    <div class="param-row">
+                        <span class="param-label">Quantity</span>
+                        <span class="param-value">${qty}</span>
+                    </div>
+                </div>
+                <div class="status-box">
+                    <span id="statusIcon"><div class="loader"></div></span>
+                    <span id="statusText" class="status-text">Initializing...</span>
+                    <ul class="step-list">
+                        <li id="step1" class="active">Connecting to Ruijie Cloud API</li>
+                        <li id="step2" class="pending">Generating Vouchers</li>
+                        <li id="step3" class="pending">Opening Print Page</li>
+                    </ul>
+                </div>
+            `;
+
+            // ลบ query params ทันทีเพื่อกัน refresh ซ้ำ
+            history.replaceState(null, '', window.location.pathname);
+
+            function setStep(n, state) {
+                document.getElementById('step' + n).className = state;
+            }
+
+            function showError(msg) {
+                document.getElementById('statusIcon').innerHTML = '';
+                const t = document.getElementById('statusText');
+                t.textContent = msg;
+                t.className = 'status-text status-error';
+            }
+
+            async function run() {
+                try {
+                    // Step 1: Generate vouchers via Ruijie Cloud API
+                    setStep(1, 'active');
+                    document.getElementById('statusText').textContent = 'Communicating with Ruijie Cloud...';
+
+                    const voucherRes = await fetch('/SOS/generate-voucher', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ groupname: gn, profile_name: pn, quantity: qty })
+                    });
+
+                    if (!voucherRes.ok) {
+                        const err = await voucherRes.text();
+                        throw new Error('Voucher API failed: ' + err);
+                    }
+
+                    const voucherJson = await voucherRes.json();
+                    const tickets = voucherJson.data;
+                    if (!tickets || tickets.length === 0) {
+                        throw new Error('No voucher data returned from API.');
+                    }
+
+                    setStep(1, 'done');
+
+                    // Step 2: Map to TicketData
+                    setStep(2, 'active');
+                    document.getElementById('statusText').textContent =
+                        'Tickets generated (' + tickets.length + '). Rendering layout...';
+
+                    const ticketPayload = tickets.map(function (t) {
+                        return {
+                            voucher_code: t.voucher_code,
+                            profile_name: t.profile_name,
+                            concurrent_devices: t.concurrent_devices || 1,
+                            period: t.period_hours || '1Days',
+                            maximum_download_rate: t.maximum_download_rate_mbps || '20Mbps'
+                        };
+                    });
+
+                    setStep(2, 'done');
+
+                    // Step 3: Render print HTML
+                    setStep(3, 'active');
+                    document.getElementById('statusText').textContent = 'Opening print page...';
+
+                    const ticketRes = await fetch('/SOS/generate-ticket', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(ticketPayload)
+                    });
+
+                    if (!ticketRes.ok) {
+                        const err = await ticketRes.text();
+                        throw new Error('Ticket render failed: ' + err);
+                    }
+
+                    const html = await ticketRes.text();
+                    setStep(3, 'done');
+
+                    // เปลี่ยนหน้าปัจจุบันเป็น voucher print (เหมือน redirect)
+                    document.open();
+                    document.write(html);
+                    document.close();
+
+                } catch (e) {
+                    for (let i = 1; i <= 3; i++) {
+                        if (document.getElementById('step' + i).className === 'active') {
+                            setStep(i, 'error');
+                            break;
+                        }
+                    }
+                    showError(e.message);
+                }
+            }
+
+            // Auto-start
+            setTimeout(run, 300);
+        })();
+    </script>
+</body>
+
+</html>
